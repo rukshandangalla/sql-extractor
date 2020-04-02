@@ -11,6 +11,7 @@
             icon="el-icon-minus"
             circle
             size="small"
+            @click="minimizeApp()"
           ></el-button>
         </el-col>
         <el-col :span="12">
@@ -35,6 +36,9 @@ export default {
   methods: {
     quitApp() {
       remote.app.quit();
+    },
+    minimizeApp() {
+      remote.getCurrentWindow().minimize();
     }
   }
 };
