@@ -34,19 +34,25 @@
             <el-divider>
               <b>Databases</b>
             </el-divider>
-            <el-select v-model="selectedDB" placeholder="Select Database">
+            <el-select
+              v-model="selectedDB"
+              placeholder="Select Database"
+              @change="onDBSelect($event)"
+            >
               <el-option v-for="db in dbList" :key="db.value" :label="db.label" :value="db"></el-option>
             </el-select>
           </el-col>
         </el-row>
       </el-col>
-      <el-col :span="18"></el-col>
+      <el-col :span="1">
+        <div class="main-seperator"></div>
+      </el-col>
+      <el-col :span="17">
+        <el-table :data="spList" border stripe style="width: 100%">
+          <el-table-column prop="name" label="SP Name"></el-table-column>
+        </el-table>
+      </el-col>
     </el-row>
-    <el-table :data="tableData" stripe style="width: 100%">
-      <el-table-column prop="date" label="Date" width="180"></el-table-column>
-      <el-table-column prop="name" label="Name" width="180"></el-table-column>
-      <el-table-column prop="address" label="Address"></el-table-column>
-    </el-table>
   </div>
 </template>
 
@@ -63,27 +69,7 @@ export default {
       password: "qaz@123",
       dbList: [],
       selectedDB: {},
-      tableData: [
-        {
-          date: '2016-05-03',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles'
-        },
-        {
-          date: '2016-05-02',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles'
-        },
-        {
-          date: '2016-05-04',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles'
-        },
-        {
-          date: '2016-05-01',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles'
-        }]
+      spList: []
     };
   },
   methods: {
@@ -106,13 +92,29 @@ export default {
           this.dbList.push({ value: r.database_id, label: r.name });
         });
 
+        sql.close();
       } catch (err) {
         console.log(err);
-        this.$notify.error({
-          title: "Error Occured",
-          message: err,
-          position: "bottom-right"
+        this.$notify.error({ title: "Error Occured", message: err, position: "bottom-right" });
+      }
+    },
+    async onDBSelect(evt) {
+      try {
+        const connection = `mssql://${this.username}:${this.password}@${this.serverName}/${this.selectedDB.label}`;
+        await sql.connect(connection);
+
+        const result = await sql.query(`SELECT ROUTINE_SCHEMA, ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE';`);
+
+        this.spList = [];
+        result.recordset.forEach(r => {
+          this.spList.push({ name: `[${r.ROUTINE_SCHEMA}].[${r.ROUTINE_NAME}]` });
         });
+
+        sql.close();
+
+      } catch (err) {
+        console.log(err);
+        this.$notify.error({ title: "Error Occured", message: err, position: "bottom-right" });
       }
     }
   }
@@ -128,5 +130,14 @@ export default {
 }
 .el-row:last-child {
   margin-bottom: 0;
+}
+.main-seperator {
+  height: 30vh;
+  width: 1px;
+  margin-top: 50px;
+  background-color: #dcdfe6;
+}
+.list {
+  max-height: 200px;
 }
 </style>
