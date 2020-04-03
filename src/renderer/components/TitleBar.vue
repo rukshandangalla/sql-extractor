@@ -1,27 +1,13 @@
 <template>
   <div id="title_bar" class="title_bar">
-    <div class="title">
-      Eclipse Script Generator
-    </div>
+    <div class="title">Eclipse Script Generator</div>
     <div class="btn_section">
       <el-row :gutter="10">
         <el-col :span="12">
-          <el-button
-            type="warning"
-            icon="el-icon-minus"
-            circle
-            size="small"
-            @click="minimizeApp()"
-          ></el-button>
+          <el-button type="warning" icon="el-icon-minus" circle size="small" @click="minimizeApp()"></el-button>
         </el-col>
         <el-col :span="12">
-          <el-button
-            type="danger"
-            icon="el-icon-close"
-            circle
-            size="small"
-            @click="quitApp()"
-          ></el-button>
+          <el-button type="danger" icon="el-icon-close" circle size="small" @click="quitApp()"></el-button>
         </el-col>
       </el-row>
     </div>
