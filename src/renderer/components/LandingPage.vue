@@ -48,7 +48,21 @@
         <div class="main-seperator"></div>
       </el-col>
       <el-col :span="17">
-        <el-table :data="spList" border stripe style="width: 100%">
+        <el-input
+          placeholder="Search SP.."
+          prefix-icon="el-icon-search"
+          v-model="spSearchText"
+          @change="onSearchTextChange()"
+        ></el-input>
+        <el-table
+          :data="filteredSPList"
+          stripe
+          style="width: 100%"
+          height="400"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="name" label="SP Name"></el-table-column>
         </el-table>
       </el-col>
@@ -69,8 +83,13 @@ export default {
       password: "qaz@123",
       dbList: [],
       selectedDB: {},
-      spList: []
+      spList: [],
+      filteredSPList: [],
+      spSearchText: ''
     };
+  },
+  mounted() {
+    
   },
   methods: {
     async connect() {
@@ -110,12 +129,20 @@ export default {
           this.spList.push({ name: `[${r.ROUTINE_SCHEMA}].[${r.ROUTINE_NAME}]` });
         });
 
+        this.filteredSPList = this.spList;
+
         sql.close();
 
       } catch (err) {
         console.log(err);
         this.$notify.error({ title: "Error Occured", message: err, position: "bottom-right" });
       }
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    onSearchTextChange() {
+      
     }
   }
 };
@@ -136,8 +163,5 @@ export default {
   width: 1px;
   margin-top: 50px;
   background-color: #dcdfe6;
-}
-.list {
-  max-height: 200px;
 }
 </style>
